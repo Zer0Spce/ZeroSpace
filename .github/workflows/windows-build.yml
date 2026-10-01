@@ -1,5 +1,5 @@
 name: Windows Build
-# Milestone build: manual or workflow-file changes only. Packaging retry after icon/CSS fixes.
+# Milestone build: manual or workflow-file changes only. Milestone build: static libarchive so the shipped executable has no archive.dll runtime dependency.
 
 'on':
   workflow_dispatch:
@@ -30,11 +30,11 @@ jobs:
       - name: Install libarchive
         shell: pwsh
         run: |
-          vcpkg install libarchive:x64-windows
+          vcpkg install libarchive:x64-windows-static
       - name: Build ZSFTP core
         shell: pwsh
         run: |
-          cmake -S engines/zsftp -B engines/zsftp/build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
+          cmake -S engines/zsftp -B engines/zsftp/build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
           cmake --build engines/zsftp/build --config Release
       - name: Build ZeroSpace installer
         shell: pwsh
