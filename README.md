@@ -11,11 +11,12 @@ ZeroSpace grows the proven ZSFTP transfer workflow into a modular desktop applic
 - Sidebar shells for FTP Manager, Files, Games, Packages, Payloads, Captures, Power, System, Tools and Settings
 - No ps5upload Stream & Install clone
 - No GPL ps5upload source copied into this repository
+- ZSFTP 1.2 source integrated as the native Transfer engine
 - CI intentionally omitted during early iteration to avoid wasting GitHub Actions minutes
 
 ## Transfer
 
-The Transfer module is for RAR, ZIP and 7z archive contents sent directly to a PS5 FTP server without first creating a second fully extracted copy on the PC. The current foundation includes the desktop-to-ZSFTP adapter; the existing ZSFTP engine itself still needs to be imported/bundled from the original PS5 ZeroSpace FTP repository.
+The Transfer module is for RAR, ZIP and 7z archive contents sent directly to a PS5 FTP server without first creating a second fully extracted copy on the PC. The ZSFTP source is now integrated under `engines/zsftp/`. ZeroSpace links directly to its C API (`zsftpcore`) so Transfer can start, poll, cancel and close native transfer jobs without launching a separate CLI process.
 
 ## Development
 
