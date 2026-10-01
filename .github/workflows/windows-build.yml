@@ -1,5 +1,5 @@
 name: Windows Build
-# Milestone build: manual or workflow-file changes only. Milestone build: static libarchive so the shipped executable has no archive.dll runtime dependency.
+# Milestone build: ZSFTP-style transfer UI, native archive picker, quiet Windows launch, and refined palette.
 
 'on':
   workflow_dispatch:
