@@ -1,5 +1,5 @@
 name: Windows Build
-# Milestone build: enable the native archive picker capability in the packaged Windows app.
+# Portable milestone build: installer bundling intentionally deferred.
 
 'on':
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
         run: |
           cmake -S engines/zsftp -B engines/zsftp/build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
           cmake --build engines/zsftp/build --config Release
-      - name: Build ZeroSpace installer
+      - name: Build ZeroSpace portable app
         shell: pwsh
         run: |
           $lib = Resolve-Path "engines/zsftp/build/Release" -ErrorAction SilentlyContinue
@@ -47,7 +47,6 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force artifact | Out-Null
-          Get-ChildItem src-tauri/target/release/bundle/nsis -Filter *.exe -ErrorAction SilentlyContinue | Copy-Item -Destination artifact
           if (Test-Path src-tauri/target/release/zerospace.exe) { Copy-Item src-tauri/target/release/zerospace.exe artifact }
           Get-ChildItem engines/zsftp/build -Recurse -Filter zsftpcore.dll | Select-Object -First 1 | Copy-Item -Destination artifact
       - uses: actions/upload-artifact@v4
