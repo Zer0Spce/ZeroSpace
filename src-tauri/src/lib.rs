@@ -4,6 +4,7 @@ use serde::{Deserialize,Serialize};
 use serde_json::Value;
 use std::{fs,path::PathBuf,sync::{Mutex,MutexGuard,PoisonError}};
 use tauri::State;
+use suppaftp::FtpStream;
 use zsftp::Job;
 
 #[derive(Debug,Clone,Copy,PartialEq,Eq,Serialize,Deserialize)] #[serde(rename_all="snake_case")] pub enum Mode{Passive,Active}
@@ -21,4 +22,14 @@ impl AppState{fn lock(&self)->MutexGuard<'_,Option<Job>>{self.job.lock().unwrap_
 #[tauri::command] fn create_local_folder(path:String)->Result<(),String>{fs::create_dir_all(path).map_err(|e|e.to_string())}
 #[tauri::command] fn rename_local_path(from:String,to:String)->Result<(),String>{fs::rename(from,to).map_err(|e|e.to_string())}
 #[tauri::command] fn delete_local_path(path:String)->Result<(),String>{let p=PathBuf::from(path);if p.is_dir(){fs::remove_dir_all(p)}else{fs::remove_file(p)}.map_err(|e|e.to_string())}
-pub fn run(){tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,close_zsftp_transfer,list_local_directory,create_local_folder,rename_local_path,delete_local_path]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
+
+#[derive(Deserialize)] #[serde(rename_all="camelCase")] struct FtpRequest{host:String,port:u16,user:Option<String>,password:Option<String>,path:String}
+#[derive(Serialize)] #[serde(rename_all="camelCase")] struct RemoteEntry{name:String,path:String,is_dir:bool,size:Option<u64>}
+fn ftp_login(r:&FtpRequest)->Result<FtpStream,String>{let mut ftp=FtpStream::connect((r.host.as_str(),r.port)).map_err(|e|e.to_string())?;let u=r.user.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous");let p=r.password.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous@");ftp.login(u,p).map_err(|e|e.to_string())?;Ok(ftp)}
+fn remote_join(base:&str,name:&str)->String{format!("{}/{}",base.trim_end_matches('/'),name).replace("//","/")}
+#[tauri::command] async fn ftp_list(request:FtpRequest)->Result<Vec<RemoteEntry>,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;let names=ftp.nlst(None).map_err(|e|e.to_string())?;let mut out=Vec::new();for name in names{let clean=name.rsplit('/').next().unwrap_or(&name).to_string();if clean.is_empty()||clean=="."||clean==".."{continue}let path=remote_join(&request.path,&clean);let size=ftp.size(&clean).ok().flatten();let is_dir=if size.is_some(){false}else{ftp.cwd(&clean).is_ok()};if is_dir{let _=ftp.cdup();}out.push(RemoteEntry{name:clean,path,is_dir,size});}let _=ftp.quit();out.sort_by(|a,b|b.is_dir.cmp(&a.is_dir).then_with(||a.name.to_lowercase().cmp(&b.name.to_lowercase())));Ok(out)}).await.map_err(|e|e.to_string())?}
+#[tauri::command] async fn ftp_create_folder(request:FtpRequest,name:String)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;ftp.mkdir(&name).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
+#[tauri::command] async fn ftp_delete(request:FtpRequest,name:String,is_dir:bool)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;if is_dir{ftp.rmdir(&name)}else{ftp.rm(&name)}.map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
+#[tauri::command] async fn ftp_rename(request:FtpRequest,from:String,to:String)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;ftp.rename(&from,&to).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
+
+pub fn run(){tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,close_zsftp_transfer,list_local_directory,create_local_folder,rename_local_path,delete_local_path,ftp_list,ftp_create_folder,ftp_delete,ftp_rename]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
