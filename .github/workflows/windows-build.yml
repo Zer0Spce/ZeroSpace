@@ -1,5 +1,5 @@
 name: Windows Build
-# Milestone build: ZSFTP-style transfer UI, native archive picker, quiet Windows launch, and refined palette.
+# Milestone build: enable the native archive picker capability in the packaged Windows app.
 
 'on':
   workflow_dispatch:
