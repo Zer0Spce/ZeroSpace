@@ -1,5 +1,5 @@
 name: Windows Build
-# Milestone build: manual or workflow-file changes only.
+# Milestone build: manual or workflow-file changes only. Packaging retry after icon/CSS fixes.
 
 'on':
   workflow_dispatch:
