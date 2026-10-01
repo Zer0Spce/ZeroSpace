@@ -7,3 +7,8 @@ export const startTransfer=(request:TransferRequest)=>invoke<string>("start_zsft
 export const pollTransfer=(cursor=0)=>invoke<TransferState>("poll_zsftp_transfer",{cursor});
 export const cancelTransfer=()=>invoke<void>("cancel_zsftp_transfer");
 export const closeTransfer=()=>invoke<void>("close_zsftp_transfer");
+export type LocalEntry={name:string;path:string;isDir:boolean;size:number;modified:number|null};
+export const listLocalDirectory=(path:string)=>invoke<LocalEntry[]>("list_local_directory",{path});
+export const createLocalFolder=(path:string)=>invoke<void>("create_local_folder",{path});
+export const renameLocalPath=(from:string,to:string)=>invoke<void>("rename_local_path",{from,to});
+export const deleteLocalPath=(path:string)=>invoke<void>("delete_local_path",{path});
