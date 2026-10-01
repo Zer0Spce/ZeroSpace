@@ -12,3 +12,10 @@ export const listLocalDirectory=(path:string)=>invoke<LocalEntry[]>("list_local_
 export const createLocalFolder=(path:string)=>invoke<void>("create_local_folder",{path});
 export const renameLocalPath=(from:string,to:string)=>invoke<void>("rename_local_path",{from,to});
 export const deleteLocalPath=(path:string)=>invoke<void>("delete_local_path",{path});
+
+export type FtpRequest={host:string;port:number;user?:string;password?:string;path:string};
+export type RemoteEntry={name:string;path:string;isDir:boolean;size:number|null};
+export const ftpList=(request:FtpRequest)=>invoke<RemoteEntry[]>("ftp_list",{request});
+export const ftpCreateFolder=(request:FtpRequest,name:string)=>invoke<void>("ftp_create_folder",{request,name});
+export const ftpDelete=(request:FtpRequest,name:string,isDir:boolean)=>invoke<void>("ftp_delete",{request,name,isDir});
+export const ftpRename=(request:FtpRequest,from:string,to:string)=>invoke<void>("ftp_rename",{request,from,to});
