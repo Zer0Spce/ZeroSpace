@@ -1,0 +1,47 @@
+name: Windows Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/windows-build.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install frontend dependencies
+        run: npm install
+      - name: Build ZSFTP core
+        shell: pwsh
+        run: |
+          cmake -S engines/zsftp -B engines/zsftp/build -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
+          cmake --build engines/zsftp/build --config Release
+      - name: Build ZeroSpace installer
+        shell: pwsh
+        run: |
+          $lib = Resolve-Path "engines/zsftp/build/Release" -ErrorAction SilentlyContinue
+          if (-not $lib) { $lib = Resolve-Path "engines/zsftp/build" }
+          $env:ZSFTP_LIB_DIR = $lib.Path
+          npm run tauri build
+      - name: Collect Windows build
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifact | Out-Null
+          Get-ChildItem src-tauri/target/release/bundle/nsis -Filter *.exe -ErrorAction SilentlyContinue | Copy-Item -Destination artifact
+          if (Test-Path src-tauri/target/release/zerospace.exe) { Copy-Item src-tauri/target/release/zerospace.exe artifact }
+          Get-ChildItem engines/zsftp/build -Recurse -Filter zsftpcore.dll | Select-Object -First 1 | Copy-Item -Destination artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ZeroSpace-Windows-x64
+          path: artifact/*
+          if-no-files-found: error
+          retention-days: 7
