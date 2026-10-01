@@ -2,7 +2,7 @@ mod zsftp;
 
 use serde::{Deserialize,Serialize};
 use serde_json::Value;
-use std::{fs,io::Write,path::PathBuf,sync::{Mutex,MutexGuard,PoisonError}};
+use std::{fs,io::{Read,Write},path::PathBuf,sync::{Mutex,MutexGuard,PoisonError}};
 use tauri::State;
 use suppaftp::{FtpError,FtpStream};
 use zsftp::Job;
