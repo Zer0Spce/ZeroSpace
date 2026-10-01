@@ -1,0 +1,1 @@
+fn main(){zerospace_lib::run();}
