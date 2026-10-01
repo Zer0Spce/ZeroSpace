@@ -18,7 +18,7 @@ ZeroSpace is a modular Windows desktop application. The existing ZSFTP transfer 
 
 ## ZSFTP boundary
 
-The desktop shell talks to ZSFTP through a narrow adapter. The foundation currently detects and launches `zsftp.exe`. The existing ZSFTP engine source/binary still needs to be imported from the original repository so the Transfer module is self-contained.
+The desktop shell talks to ZSFTP through a narrow adapter. The ZSFTP 1.2 source lives in `engines/zsftp/`. ZeroSpace's Rust backend links to the engine's existing `zsftpcore` C API and owns the transfer job lifecycle directly. The legacy standalone ZSFTP GUI is intentionally not carried forward.
 
 This keeps archive extraction and FTP streaming isolated from future modules and reduces the chance of regressions in the proven transfer path.
 
