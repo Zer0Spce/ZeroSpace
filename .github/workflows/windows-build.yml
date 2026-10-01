@@ -1,4 +1,5 @@
-name: Windows Build\n# Milestone build: manual or workflow-file changes only.
+name: Windows Build
+# Milestone build: manual or workflow-file changes only.
 
 on:
   workflow_dispatch:
