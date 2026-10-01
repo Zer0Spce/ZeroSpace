@@ -16,4 +16,4 @@ impl AppState{fn lock(&self)->MutexGuard<'_,Option<Job>>{self.job.lock().unwrap_
 #[tauri::command] async fn poll_zsftp_transfer(state:State<'_,AppState>,cursor:u64)->Result<Value,String>{state.poll(cursor)}
 #[tauri::command] async fn cancel_zsftp_transfer(state:State<'_,AppState>)->Result<(),String>{state.cancel();Ok(())}
 #[tauri::command] async fn close_zsftp_transfer(state:State<'_,AppState>)->Result<(),String>{if let Some(j)=state.take(){tauri::async_runtime::spawn_blocking(move||drop(j)).await.map_err(|e|e.to_string())?}Ok(())}
-pub fn run(){tauri::Builder::default().manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,close_zsftp_transfer]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
+pub fn run(){tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,close_zsftp_transfer]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
