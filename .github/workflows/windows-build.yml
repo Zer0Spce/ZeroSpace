@@ -1,5 +1,5 @@
 name: Windows Build
-# Portable milestone build: SuppaFTP compile fix validation; installer deferred.
+# Portable milestone build: validate audited SuppaFTP API fixes; installer deferred.
 
 'on':
   workflow_dispatch:
