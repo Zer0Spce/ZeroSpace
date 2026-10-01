@@ -26,14 +26,11 @@
     }
   },
   "bundle": {
-    "active": true,
+    "active": false,
     "targets": [
       "nsis"
     ],
     "shortDescription": "All-in-one Windows toolkit for PS5",
-    "longDescription": "PS5 file management and direct archive-to-FTP transfers.",
-    "resources": {
-      "../engines/zsftp/build/Release/zsftpcore.dll": "zsftpcore.dll"
-    }
+    "longDescription": "PS5 file management and direct archive-to-FTP transfers."
   }
 }
