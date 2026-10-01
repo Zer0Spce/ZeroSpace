@@ -4,7 +4,7 @@ use serde::{Deserialize,Serialize};
 use serde_json::Value;
 use std::{fs,io::{Read,Write},path::PathBuf,sync::{Mutex,MutexGuard,PoisonError}};
 use tauri::State;
-use suppaftp::FtpStream;
+use suppaftp::{FtpError,FtpStream};
 use zsftp::Job;
 
 #[derive(Debug,Clone,Copy,PartialEq,Eq,Serialize,Deserialize)] #[serde(rename_all="snake_case")] pub enum Mode{Passive,Active}
@@ -34,6 +34,6 @@ fn remote_join(base:&str,name:&str)->String{format!("{}/{}",base.trim_end_matche
 #[tauri::command] async fn ftp_rename(request:FtpRequest,from:String,to:String)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;ftp.rename(&from,&to).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
 
 #[tauri::command] async fn ftp_upload(request:FtpRequest,local_path:String,remote_name:String)->Result<u64,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;let mut file=fs::File::open(&local_path).map_err(|e|e.to_string())?;let size=file.metadata().map_err(|e|e.to_string())?.len();ftp.put_file(&remote_name,&mut file).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(size)}).await.map_err(|e|e.to_string())?}
-#[tauri::command] async fn ftp_download(request:FtpRequest,remote_name:String,local_path:String)->Result<u64,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;let mut reader=ftp.retr_as_stream(&remote_name).map_err(|e|e.to_string())?;let mut file=fs::File::create(&local_path).map_err(|e|e.to_string())?;let mut buf=[0u8;1024*1024];let mut total=0u64;loop{let n=reader.read(&mut buf).map_err(|e|e.to_string())?;if n==0{break}file.write_all(&buf[..n]).map_err(|e|e.to_string())?;total+=n as u64;}drop(reader);ftp.finalize_retr_stream().map_err(|e|e.to_string())?;let _=ftp.quit();Ok(total)}).await.map_err(|e|e.to_string())?}
+#[tauri::command] async fn ftp_download(request:FtpRequest,remote_name:String,local_path:String)->Result<u64,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;let mut file=fs::File::create(&local_path).map_err(|e|e.to_string())?;let total=ftp.retr(&remote_name,|stream|{let mut buf=[0u8;1024*1024];let mut total=0u64;loop{let n=stream.read(&mut buf).map_err(FtpError::ConnectionError)?;if n==0{break}file.write_all(&buf[..n]).map_err(FtpError::ConnectionError)?;total+=n as u64;}Ok(total)}).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(total)}).await.map_err(|e|e.to_string())?}
 
 pub fn run(){tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,answer_zsftp_password,close_zsftp_transfer,list_local_directory,create_local_folder,rename_local_path,delete_local_path,ftp_list,ftp_create_folder,ftp_delete,ftp_rename,ftp_upload,ftp_download]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
