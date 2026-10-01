@@ -27,10 +27,14 @@ jobs:
           New-Item -ItemType Directory -Force engines/zsftp/unrarsrc | Out-Null
           tar -xzf unrarsrc.tar.gz -C engines/zsftp/unrarsrc --strip-components=1
           if (-not (Test-Path engines/zsftp/unrarsrc/rar.hpp)) { throw "UnRAR source extraction failed" }
+      - name: Install libarchive
+        shell: pwsh
+        run: |
+          vcpkg install libarchive:x64-windows
       - name: Build ZSFTP core
         shell: pwsh
         run: |
-          cmake -S engines/zsftp -B engines/zsftp/build -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
+          cmake -S engines/zsftp -B engines/zsftp/build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
           cmake --build engines/zsftp/build --config Release
       - name: Build ZeroSpace installer
         shell: pwsh
