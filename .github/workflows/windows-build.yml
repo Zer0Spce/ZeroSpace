@@ -1,5 +1,5 @@
 name: Windows Build
-# Portable milestone rebuild after Games metadata typing fix; installer deferred.
+# Portable milestone rebuild after FTP compatibility fixes; installer deferred.
 
 'on':
   workflow_dispatch:
