@@ -4,7 +4,8 @@ use serde::{Deserialize,Serialize};
 use serde_json::Value;
 use std::{fs,io::{Read,Write},net::TcpStream,path::PathBuf,sync::{Mutex,MutexGuard,PoisonError},time::Duration};
 use tauri::State;
-use suppaftp::{list::ListParser,types::FileType,FtpError,FtpStream};
+use suppaftp::{list::File as FtpListFile,types::FileType,FtpError,FtpStream};
+use std::convert::TryFrom;
 use zsftp::Job;
 
 #[derive(Debug,Clone,Copy,PartialEq,Eq,Serialize,Deserialize)] #[serde(rename_all="snake_case")] pub enum Mode{Passive,Active}
