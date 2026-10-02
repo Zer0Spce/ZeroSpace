@@ -20,6 +20,7 @@ export const ftpCreateFolder=(request:FtpRequest,name:string)=>invoke<void>("ftp
 export const ftpDelete=(request:FtpRequest,name:string,isDir:boolean)=>invoke<void>("ftp_delete",{request,name,isDir});
 export const ftpRename=(request:FtpRequest,from:string,to:string)=>invoke<void>("ftp_rename",{request,from,to});
 
+export const ftpReadText=(request:FtpRequest,remoteName:string,maxBytes=1048576)=>invoke<string>("ftp_read_text",{request,remoteName,maxBytes});
 export const ftpUpload=(request:FtpRequest,localPath:string,remoteName:string)=>invoke<number>("ftp_upload",{request,localPath,remoteName});
 export const ftpDownload=(request:FtpRequest,remoteName:string,localPath:string)=>invoke<number>("ftp_download",{request,remoteName,localPath});
 
