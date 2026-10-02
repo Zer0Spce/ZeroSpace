@@ -27,6 +27,7 @@ export const ftpDownload=(request:FtpRequest,remoteName:string,localPath:string)
 export const answerTransferPassword=(password:string|null)=>invoke<void>("answer_zsftp_password",{password});
 
 export const sendPayload=(host:string,port:number,path:string)=>invoke<number>("send_payload",{host,port,path});
+export const sendBundledHelper=(host:string)=>invoke<number>("send_bundled_helper",{host});
 
 export type HelperStatus=Record<string,unknown>;
 export type HelperGame={title_id:string;title_name?:string;src?:string;image_backed?:boolean};
