@@ -1,5 +1,5 @@
 name: Windows Build
-# Portable milestone build: validate audited SuppaFTP API fixes; installer deferred.
+# Portable milestone build: validate FTP Manager, Payloads, and shared settings batch; installer deferred.
 
 'on':
   workflow_dispatch:
