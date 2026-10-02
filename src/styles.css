@@ -23,3 +23,5 @@ select{width:100%;margin-top:7px;background:var(--input);border:1px solid var(--
 .payloadCard{max-width:900px;margin-top:24px}.payloadHint{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:10px;line-height:1.6}.payloadCard .grid3{grid-template-columns:1fr .45fr 1.8fr}.payloadCard .archiveRow input{margin-top:7px}
 
 .payloadHistory{max-width:900px;margin-top:16px}.payloadHistory .queueRow{grid-template-columns:.55fr 1.5fr 1fr .5fr auto}.historyFooter{display:flex;justify-content:flex-end;padding-top:12px;border-top:1px solid var(--border);margin-top:8px}
+
+.ftpStatus{display:flex;align-items:center;gap:8px}.connectionDot{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}.connectionDot.online{background:var(--cyan);box-shadow:0 0 0 3px color-mix(in srgb,var(--cyan) 12%,transparent)}.remoteTools button:disabled{opacity:.38;cursor:not-allowed}
