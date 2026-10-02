@@ -1,5 +1,5 @@
 name: Windows Build
-# Portable milestone build: validate FTP Manager, Payloads, and shared settings batch; installer deferred.
+# Portable milestone build: validate FTP compatibility, Captures, Games, Payloads, and shared settings; installer deferred.
 
 'on':
   workflow_dispatch:
