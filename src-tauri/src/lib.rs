@@ -4,7 +4,7 @@ use serde::{Deserialize,Serialize};
 use serde_json::Value;
 use std::{fs,io::{Read,Write},net::TcpStream,path::PathBuf,sync::{Mutex,MutexGuard,PoisonError},time::Duration};
 use tauri::State;
-use suppaftp::{list::ListParser,FtpError,FtpStream};
+use suppaftp::{list::ListParser,types::FileType,FtpError,FtpStream};
 use zsftp::Job;
 
 #[derive(Debug,Clone,Copy,PartialEq,Eq,Serialize,Deserialize)] #[serde(rename_all="snake_case")] pub enum Mode{Passive,Active}
@@ -26,7 +26,7 @@ impl AppState{fn lock(&self)->MutexGuard<'_,Option<Job>>{self.job.lock().unwrap_
 
 #[derive(Deserialize)] #[serde(rename_all="camelCase")] struct FtpRequest{host:String,port:u16,user:Option<String>,password:Option<String>,path:String}
 #[derive(Serialize)] #[serde(rename_all="camelCase")] struct RemoteEntry{name:String,path:String,is_dir:bool,size:Option<u64>}
-fn ftp_login(r:&FtpRequest)->Result<FtpStream,String>{let mut ftp=FtpStream::connect((r.host.as_str(),r.port)).map_err(|e|e.to_string())?;let u=r.user.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous");let p=r.password.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous@");ftp.login(u,p).map_err(|e|e.to_string())?;Ok(ftp)}
+fn ftp_login(r:&FtpRequest)->Result<FtpStream,String>{let mut ftp=FtpStream::connect((r.host.as_str(),r.port)).map_err(|e|format!("Connect to {}:{}: {e}",r.host,r.port))?;ftp.set_passive_nat_workaround(true);let u=r.user.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous");let p=r.password.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous@");ftp.login(u,p).map_err(|e|format!("FTP login: {e}"))?;ftp.transfer_type(FileType::Binary).map_err(|e|format!("Set binary mode: {e}"))?;Ok(ftp)}
 fn remote_join(base:&str,name:&str)->String{format!("{}/{}",base.trim_end_matches('/'),name).replace("//","/")}
 #[tauri::command] async fn ftp_list(request:FtpRequest)->Result<Vec<RemoteEntry>,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|format!("Open {}: {e}",request.path))?;let lines=ftp.list(None).map_err(|e|format!("List {}: {e}",request.path))?;let mut out=Vec::new();for line in lines{let parsed=ListParser::parse_posix(&line).or_else(|_|ListParser::parse_dos(&line));let Ok(file)=parsed else{continue};let name=file.name().to_string();if name.is_empty()||name=="."||name==".."{continue}let is_dir=file.is_directory();out.push(RemoteEntry{name:name.clone(),path:remote_join(&request.path,&name),is_dir,size:if is_dir{None}else{Some(file.size() as u64)}});}let _=ftp.quit();out.sort_by(|a,b|b.is_dir.cmp(&a.is_dir).then_with(||a.name.to_lowercase().cmp(&b.name.to_lowercase())));Ok(out)}).await.map_err(|e|e.to_string())?}
 #[tauri::command] async fn ftp_create_folder(request:FtpRequest,name:String)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;ftp.mkdir(&name).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
