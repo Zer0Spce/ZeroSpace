@@ -1,4 +1,4 @@
-import { useEffect,useMemo,useState } from "react";
+import { useEffect,useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import {ArrowLeftRight,Box,Boxes,Camera,FileArchive,FolderOpen,Gamepad2,HardDrive,Power,Rocket,Settings,SlidersHorizontal,TerminalSquare,Sun,Moon,FileSearch,Activity} from "lucide-react";
 import {getEngineStatus,startTransfer,pollTransfer,cancelTransfer,listLocalDirectory,createLocalFolder,renameLocalPath,deleteLocalPath,ftpList,ftpCreateFolder,ftpDelete,ftpRename,ftpReadText,ftpUpload,ftpDownload,answerTransferPassword,sendPayload,sendBundledHelper,helperStatus,helperListRegisteredGames,helperListScreenshots,helperListVideos,helperDownloadFile,helperReadFile,helperGameIcon,bytesToImageUrl,type HelperGame,type HelperCapture,type EngineStatus,type LocalEntry,type RemoteEntry} from "./lib/tauri";
