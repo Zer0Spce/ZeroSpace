@@ -35,3 +35,7 @@ export type HelperCapture={path:string;size:number;mtime:number};
 export const helperStatus=(host:string)=>invoke<HelperStatus>("helper_status",{host});
 export const helperListRegisteredGames=(host:string)=>invoke<{apps:HelperGame[]}>("helper_list_registered_games",{host});
 export const helperListScreenshots=(host:string)=>invoke<{items:HelperCapture[]}>("helper_list_screenshots",{host});
+
+export const helperReadFile=(host:string,path:string,limit=4194304)=>invoke<number[]>("helper_read_file",{host,path,limit});
+export const helperGameIcon=(host:string,titleId:string)=>invoke<number[]>("helper_game_icon",{host,titleId});
+export const bytesToImageUrl=(bytes:number[],mime="image/jpeg")=>URL.createObjectURL(new Blob([new Uint8Array(bytes)],{type:mime}));
