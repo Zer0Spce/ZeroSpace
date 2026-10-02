@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable rebuild after bundled-helper Tauri path fix; PS5 helper is built separately.
+# Windows portable build. Pulls the latest successful PS5 Helper artifact and bundles the real ELF.
 
 'on':
   workflow_dispatch:
@@ -36,13 +36,19 @@ jobs:
         run: |
           cmake -S engines/zsftp -B engines/zsftp/build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
           cmake --build engines/zsftp/build --config Release
-      - name: Prepare helper resource placeholder
+      - name: Download latest successful PS5 Helper artifact
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           New-Item -ItemType Directory -Force src-tauri/resources/helper | Out-Null
-          # The PS5 ELF is cross-compiled in ps5-helper-build.yml on Linux.
-          # Keep Windows builds valid without pretending a source archive is an ELF.
-          [IO.File]::WriteAllBytes("src-tauri/resources/helper/zerospace-helper.elf", [byte[]](0))
+          $run = gh run list --workflow "PS5 Helper Build" --status success --limit 1 --json databaseId --jq '.[0].databaseId'
+          if (-not $run) { throw "No successful PS5 Helper Build found" }
+          gh run download $run -n ZeroSpace-PS5-Helper -D helper-download
+          $elf = Get-ChildItem helper-download -Recurse -Filter zerospace-helper.elf | Select-Object -First 1
+          if (-not $elf -or $elf.Length -eq 0) { throw "Downloaded PS5 helper ELF is missing or empty" }
+          Copy-Item $elf.FullName src-tauri/resources/helper/zerospace-helper.elf
+          Write-Host "Bundling helper from run $run ($($elf.Length) bytes)"
       - name: Build ZeroSpace portable app
         shell: pwsh
         run: |
