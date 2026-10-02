@@ -17,3 +17,5 @@
 .localPathBar{margin-top:12px}.localPathBar input{margin:0;height:36px;padding:8px 10px;font-size:10px}.ftpPreview .pane{min-width:0}.ftpPreview .remoteList{max-height:310px}.ftpPreview .remoteRow>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .queueRow{grid-template-columns:85px minmax(160px,1fr) 80px 75px auto}.queueActions{display:flex;justify-content:flex-end;gap:5px}.queueActions button{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:6px;padding:5px 7px;cursor:pointer;font-size:9px}.queueActions button:hover{border-color:var(--blue2)}
+
+select{width:100%;margin-top:7px;background:var(--input);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:12px 13px;outline:none;font:inherit}select:focus{border-color:var(--blue2);box-shadow:0 0 0 2px color-mix(in srgb,var(--blue2) 16%,transparent)}
