@@ -6,6 +6,7 @@ name: PS5 Helper Build
     branches: [main]
     paths:
       - ".github/workflows/ps5-helper-build.yml"
+      - "helper/scripts/import_upstream.py"
 
 jobs:
   helper:
