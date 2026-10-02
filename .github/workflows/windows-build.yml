@@ -1,5 +1,5 @@
 name: Windows Build
-# Portable milestone rebuild after FTP compatibility fixes; installer deferred.
+# Helper integration milestone: bundle pinned GPL PS5 helper source build; installer deferred.
 
 'on':
   workflow_dispatch:
@@ -36,6 +36,15 @@ jobs:
         run: |
           cmake -S engines/zsftp -B engines/zsftp/build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DRARFTP_BUILD_LIBRARY=ON -DRARFTP_BUILD_TESTS=OFF -DRARFTP_BUNDLED_CURL=ON
           cmake --build engines/zsftp/build --config Release
+      - name: Fetch bundled ZeroSpace Helper
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force src-tauri/resources/helper | Out-Null
+          curl.exe -L --fail --retry 3 -o helper-src.tar.gz https://github.com/phantomptr/ps5upload/archive/a364f7a473bfd6aa5582e7474bfce54fb88a0f5a.tar.gz
+          New-Item -ItemType Directory -Force helper-upstream | Out-Null
+          tar -xzf helper-src.tar.gz -C helper-upstream --strip-components=1
+          if (-not (Test-Path helper-upstream/payload/ps5upload.elf)) { throw "Pinned upstream source archive does not contain a prebuilt helper; PS5 SDK build is required before bundling." }
+          Copy-Item helper-upstream/payload/ps5upload.elf src-tauri/resources/helper/zerospace-helper.elf
       - name: Build ZeroSpace portable app
         shell: pwsh
         run: |
