@@ -31,6 +31,9 @@
       "nsis"
     ],
     "shortDescription": "All-in-one Windows toolkit for PS5",
-    "longDescription": "PS5 file management and direct archive-to-FTP transfers."
+    "longDescription": "PS5 file management and direct archive-to-FTP transfers.",
+    "resources": [
+      "resources/helper/zerospace-helper.elf"
+    ]
   }
 }
