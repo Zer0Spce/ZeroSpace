@@ -27,3 +27,10 @@ export const ftpDownload=(request:FtpRequest,remoteName:string,localPath:string)
 export const answerTransferPassword=(password:string|null)=>invoke<void>("answer_zsftp_password",{password});
 
 export const sendPayload=(host:string,port:number,path:string)=>invoke<number>("send_payload",{host,port,path});
+
+export type HelperStatus=Record<string,unknown>;
+export type HelperGame={title_id:string;title_name?:string;src?:string;image_backed?:boolean};
+export type HelperCapture={path:string;size:number;mtime:number};
+export const helperStatus=(host:string)=>invoke<HelperStatus>("helper_status",{host});
+export const helperListRegisteredGames=(host:string)=>invoke<{apps:HelperGame[]}>("helper_list_registered_games",{host});
+export const helperListScreenshots=(host:string)=>invoke<{items:HelperCapture[]}>("helper_list_screenshots",{host});
