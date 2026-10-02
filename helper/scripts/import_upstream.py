@@ -26,6 +26,7 @@ def main():
         tf.extractall(TMP, filter="data")
     src = next(TMP.iterdir())
     shutil.copytree(src / "payload", DEST / "payload")
+    shutil.copytree(src / "scripts", DEST / "scripts")
     shutil.copy2(src / "LICENSE", DEST / "LICENSE")
     (DEST / "UPSTREAM_REVISION").write_text(UPSTREAM_REV + "\n", encoding="utf-8")
     shutil.rmtree(TMP)
