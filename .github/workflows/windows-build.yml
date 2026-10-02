@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable build. Helper-backed image preview milestone.
+# Windows portable build. Persistent tabs and capture download milestone.
 
 'on':
   workflow_dispatch:
