@@ -13,3 +13,5 @@
 .queueList{margin-top:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden}.queueRow{display:grid;grid-template-columns:85px minmax(180px,1fr) 90px 90px;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--border);font-size:10px}.queueRow:first-child{border-top:0}.queueRow>span:first-child{color:var(--blue2);font-weight:800}.queueRow strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.queueRow em{font-style:normal;color:var(--cyan);font-weight:800}.remoteRow{grid-template-columns:minmax(130px,1fr) 70px 170px}
 
 .passwordCard{margin:14px 0}.passwordCard p{color:var(--muted);font-size:12px}.passwordRow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}.passwordRow input{margin:0}.passwordRow button{margin:0}
+
+.localPathBar{margin-top:12px}.localPathBar input{margin:0;height:36px;padding:8px 10px;font-size:10px}.ftpPreview .pane{min-width:0}.ftpPreview .remoteList{max-height:310px}.ftpPreview .remoteRow>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
