@@ -24,3 +24,5 @@ export const ftpUpload=(request:FtpRequest,localPath:string,remoteName:string)=>
 export const ftpDownload=(request:FtpRequest,remoteName:string,localPath:string)=>invoke<number>("ftp_download",{request,remoteName,localPath});
 
 export const answerTransferPassword=(password:string|null)=>invoke<void>("answer_zsftp_password",{password});
+
+export const sendPayload=(host:string,port:number,path:string)=>invoke<number>("send_payload",{host,port,path});
