@@ -39,3 +39,6 @@ export const helperListScreenshots=(host:string)=>invoke<{items:HelperCapture[]}
 export const helperReadFile=(host:string,path:string,limit=4194304)=>invoke<number[]>("helper_read_file",{host,path,limit});
 export const helperGameIcon=(host:string,titleId:string)=>invoke<number[]>("helper_game_icon",{host,titleId});
 export const bytesToImageUrl=(bytes:number[],mime="image/jpeg")=>URL.createObjectURL(new Blob([new Uint8Array(bytes)],{type:mime}));
+
+export const helperListVideos=(host:string)=>invoke<{items:HelperCapture[]}>("helper_list_videos",{host});
+export const helperDownloadFile=(host:string,path:string,localPath:string)=>invoke<number>("helper_download_file",{host,path,localPath});
