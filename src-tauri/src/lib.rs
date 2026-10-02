@@ -1,4 +1,3 @@
-use tauri::Manager;
 mod zsftp;
 
 use serde::{Deserialize,Serialize};
@@ -59,10 +58,19 @@ fn helper_rpc(host:&str,frame_type:u16,expected:u16,body:&[u8])->Result<Vec<u8>,
 #[tauri::command] async fn ftp_upload(request:FtpRequest,local_path:String,remote_name:String)->Result<u64,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;let mut file=fs::File::open(&local_path).map_err(|e|e.to_string())?;let size=file.metadata().map_err(|e|e.to_string())?.len();ftp.put_file(&remote_name,&mut file).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(size)}).await.map_err(|e|e.to_string())?}
 #[tauri::command] async fn ftp_download(request:FtpRequest,remote_name:String,local_path:String)->Result<u64,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;let mut file=fs::File::create(&local_path).map_err(|e|e.to_string())?;let total=ftp.retr(&remote_name,|stream|{let mut buf=[0u8;1024*1024];let mut total=0u64;loop{let n=stream.read(&mut buf).map_err(FtpError::ConnectionError)?;if n==0{break}file.write_all(&buf[..n]).map_err(FtpError::ConnectionError)?;total+=n as u64;}Ok(total)}).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(total)}).await.map_err(|e|e.to_string())?}
 
-#[tauri::command] async fn send_bundled_helper(app:tauri::AppHandle,host:String)->Result<u64,String>{
- let path=app.path().resource_dir().map_err(|e|format!("Locate resources: {e}"))?.join("helper").join("zerospace-helper.elf");
- if !path.exists(){return Err(format!("Bundled ZeroSpace Helper not found at {}",path.display()))}
- send_payload(host,9021,path.to_string_lossy().to_string()).await
+static BUNDLED_HELPER:&[u8]=include_bytes!("../resources/helper/zerospace-helper.elf");
+
+#[tauri::command] async fn send_bundled_helper(host:String)->Result<u64,String>{
+ tauri::async_runtime::spawn_blocking(move||{
+  let bytes=BUNDLED_HELPER;
+  if bytes.is_empty(){return Err("Bundled ZeroSpace Helper is empty".into())}
+  if bytes.len()>128*1024*1024{return Err("Bundled helper is larger than the 128 MiB safety limit".into())}
+  let mut stream=TcpStream::connect_timeout(&format!("{host}:9021").parse().map_err(|e|format!("Invalid address: {e}"))?,Duration::from_secs(8)).map_err(|e|format!("Connect to {host}:9021: {e}"))?;
+  stream.set_write_timeout(Some(Duration::from_secs(30))).map_err(|e|e.to_string())?;
+  stream.write_all(bytes).map_err(|e|format!("Send bundled helper: {e}"))?;
+  stream.flush().map_err(|e|e.to_string())?;
+  Ok(bytes.len() as u64)
+ }).await.map_err(|e|e.to_string())?
 }
 
 #[tauri::command] async fn send_payload(host:String,port:u16,path:String)->Result<u64,String>{
