@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable build. Pulls the PS5 Helper ELF and embeds it directly into zerospace.exe.
+# Windows portable build. Helper-backed image preview milestone.
 
 'on':
   workflow_dispatch:
