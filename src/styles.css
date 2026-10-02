@@ -19,3 +19,5 @@
 .queueRow{grid-template-columns:85px minmax(160px,1fr) 80px 75px auto}.queueActions{display:flex;justify-content:flex-end;gap:5px}.queueActions button{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:6px;padding:5px 7px;cursor:pointer;font-size:9px}.queueActions button:hover{border-color:var(--blue2)}
 
 select{width:100%;margin-top:7px;background:var(--input);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:12px 13px;outline:none;font:inherit}select:focus{border-color:var(--blue2);box-shadow:0 0 0 2px color-mix(in srgb,var(--blue2) 16%,transparent)}
+
+.payloadCard{max-width:900px;margin-top:24px}.payloadHint{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:10px;line-height:1.6}.payloadCard .grid3{grid-template-columns:1fr .45fr 1.8fr}.payloadCard .archiveRow input{margin-top:7px}
