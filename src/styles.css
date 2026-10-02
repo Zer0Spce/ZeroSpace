@@ -31,3 +31,5 @@ select{width:100%;margin-top:7px;background:var(--input);border:1px solid var(--
 .captureActions{display:flex;justify-content:flex-end;gap:8px;padding:10px 8px;border-bottom:1px solid var(--border)}.captureRow{grid-template-columns:auto auto minmax(0,1fr) auto auto}.captureRow.selected{background:var(--active)}.captureRow input[type=checkbox]{width:15px;height:15px;margin:0;accent-color:var(--blue2)}.captureActions button:disabled,.captureRow button:disabled{opacity:.42;cursor:not-allowed}
 
 .captureFilter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 8px;border-bottom:1px solid var(--border)}.captureFilter input{margin:0}.captureFilter button{white-space:nowrap}
+
+.captureFilter{grid-template-columns:minmax(0,1fr) 150px auto}.captureFilter select{margin:0;padding:9px 10px}.captureRow{grid-template-columns:auto auto minmax(0,1fr) auto auto auto}.captureType{font-size:10px!important;border:1px solid var(--border);border-radius:999px;padding:3px 7px}.captureType.hdr{color:var(--cyan);border-color:color-mix(in srgb,var(--cyan) 35%,var(--border))}
