@@ -30,6 +30,26 @@ impl AppState{fn lock(&self)->MutexGuard<'_,Option<Job>>{self.job.lock().unwrap_
 fn ftp_login(r:&FtpRequest)->Result<FtpStream,String>{let mut ftp=FtpStream::connect((r.host.as_str(),r.port)).map_err(|e|format!("Connect to {}:{}: {e}",r.host,r.port))?;ftp.set_passive_nat_workaround(true);let u=r.user.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous");let p=r.password.as_deref().filter(|s|!s.is_empty()).unwrap_or("anonymous@");ftp.login(u,p).map_err(|e|format!("FTP login: {e}"))?;ftp.transfer_type(FileType::Binary).map_err(|e|format!("Set binary mode: {e}"))?;Ok(ftp)}
 fn remote_join(base:&str,name:&str)->String{format!("{}/{}",base.trim_end_matches('/'),name).replace("//","/")}
 #[tauri::command] async fn ftp_list(request:FtpRequest)->Result<Vec<RemoteEntry>,String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|format!("Open {}: {e}",request.path))?;let lines=ftp.list(None).map_err(|e|format!("List {}: {e}",request.path))?;let mut out=Vec::new();for line in lines{let parsed=FtpListFile::try_from(line.as_str());let Ok(file)=parsed else{continue};let name=file.name().to_string();if name.is_empty()||name=="."||name==".."{continue}let is_dir=file.is_directory();out.push(RemoteEntry{name:name.clone(),path:remote_join(&request.path,&name),is_dir,size:if is_dir{None}else{Some(file.size() as u64)}});}let _=ftp.quit();out.sort_by(|a,b|b.is_dir.cmp(&a.is_dir).then_with(||a.name.to_lowercase().cmp(&b.name.to_lowercase())));Ok(out)}).await.map_err(|e|e.to_string())?}
+const FTX2_MAGIC:u32=u32::from_le_bytes(*b"FTX2");
+const FTX2_HEADER_LEN:usize=28;
+const HELPER_MGMT_PORT:u16=9114;
+fn helper_rpc(host:&str,frame_type:u16,expected:u16,body:&[u8])->Result<Vec<u8>,String>{
+ let mut s=TcpStream::connect((host,HELPER_MGMT_PORT)).map_err(|e|format!("Helper connect {host}:{HELPER_MGMT_PORT}: {e}"))?;
+ s.set_read_timeout(Some(Duration::from_secs(10))).map_err(|e|e.to_string())?;
+ s.set_write_timeout(Some(Duration::from_secs(10))).map_err(|e|e.to_string())?;
+ let mut h=[0u8;FTX2_HEADER_LEN];
+ h[0..4].copy_from_slice(&FTX2_MAGIC.to_le_bytes());h[4..6].copy_from_slice(&1u16.to_le_bytes());h[6..8].copy_from_slice(&frame_type.to_le_bytes());h[12..20].copy_from_slice(&(body.len() as u64).to_le_bytes());h[20..28].copy_from_slice(&1u64.to_le_bytes());
+ s.write_all(&h).map_err(|e|format!("Helper send header: {e}"))?;if !body.is_empty(){s.write_all(body).map_err(|e|format!("Helper send body: {e}"))?}
+ let mut rh=[0u8;FTX2_HEADER_LEN];s.read_exact(&mut rh).map_err(|e|format!("Helper read header: {e}"))?;
+ let magic=u32::from_le_bytes(rh[0..4].try_into().unwrap());let version=u16::from_le_bytes(rh[4..6].try_into().unwrap());let kind=u16::from_le_bytes(rh[6..8].try_into().unwrap());let len=u64::from_le_bytes(rh[12..20].try_into().unwrap());
+ if magic!=FTX2_MAGIC{return Err("Helper returned invalid FTX2 magic".into())}if version!=1{return Err(format!("Unsupported helper protocol version {version}"))}if len>4*1024*1024{return Err(format!("Helper response too large: {len} bytes"))}
+ let mut out=vec![0u8;len as usize];if len>0{s.read_exact(&mut out).map_err(|e|format!("Helper read body: {e}"))?}
+ if kind==3{return Err(format!("Helper error: {}",String::from_utf8_lossy(&out)))}if kind!=expected{return Err(format!("Unexpected helper frame {kind}, expected {expected}"))}Ok(out)
+}
+#[tauri::command] async fn helper_status(host:String)->Result<serde_json::Value,String>{tauri::async_runtime::spawn_blocking(move||{let b=helper_rpc(&host,20,21,&[])?;serde_json::from_slice(&b).map_err(|e|format!("Invalid helper status JSON: {e}"))}).await.map_err(|e|e.to_string())?}
+#[tauri::command] async fn helper_list_registered_games(host:String)->Result<serde_json::Value,String>{tauri::async_runtime::spawn_blocking(move||{let b=helper_rpc(&host,62,63,&[])?;serde_json::from_slice(&b).map_err(|e|format!("Invalid helper games JSON: {e}"))}).await.map_err(|e|e.to_string())?}
+#[tauri::command] async fn helper_list_screenshots(host:String)->Result<serde_json::Value,String>{tauri::async_runtime::spawn_blocking(move||{let b=helper_rpc(&host,94,95,&[])?;serde_json::from_slice(&b).map_err(|e|format!("Invalid helper screenshots JSON: {e}"))}).await.map_err(|e|e.to_string())?}
+
 #[tauri::command] async fn ftp_create_folder(request:FtpRequest,name:String)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;ftp.mkdir(&name).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
 #[tauri::command] async fn ftp_delete(request:FtpRequest,name:String,is_dir:bool)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;if is_dir{ftp.rmdir(&name)}else{ftp.rm(&name)}.map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
 #[tauri::command] async fn ftp_rename(request:FtpRequest,from:String,to:String)->Result<(),String>{tauri::async_runtime::spawn_blocking(move||{let mut ftp=ftp_login(&request)?;ftp.cwd(&request.path).map_err(|e|e.to_string())?;ftp.rename(&from,&to).map_err(|e|e.to_string())?;let _=ftp.quit();Ok(())}).await.map_err(|e|e.to_string())?}
@@ -51,4 +71,4 @@ fn remote_join(base:&str,name:&str)->String{format!("{}/{}",base.trim_end_matche
  }).await.map_err(|e|e.to_string())?
 }
 
-pub fn run(){tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,answer_zsftp_password,close_zsftp_transfer,list_local_directory,create_local_folder,rename_local_path,delete_local_path,ftp_list,ftp_create_folder,ftp_delete,ftp_rename,ftp_read_text,ftp_upload,ftp_download,send_payload]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
+pub fn run(){tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(AppState::default()).invoke_handler(tauri::generate_handler![zsftp_engine_status,start_zsftp_transfer,poll_zsftp_transfer,cancel_zsftp_transfer,answer_zsftp_password,close_zsftp_transfer,list_local_directory,create_local_folder,rename_local_path,delete_local_path,ftp_list,helper_status,helper_list_registered_games,helper_list_screenshots,ftp_create_folder,ftp_delete,ftp_rename,ftp_read_text,ftp_upload,ftp_download,send_payload]).run(tauri::generate_context!()).expect("error while running ZeroSpace");}
