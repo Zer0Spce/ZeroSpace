@@ -28,6 +28,16 @@ def main():
     shutil.copytree(src / "payload", DEST / "payload")
     shutil.copytree(src / "scripts", DEST / "scripts")
     shutil.copy2(src / "LICENSE", DEST / "LICENSE")
+    # Runtime-visible branding only. Legal attribution and GPL notices remain unchanged.
+    for p in (DEST / "payload").rglob("*"):
+        if p.is_file() and p.suffix.lower() in {".c", ".h"}:
+            try:
+                text = p.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            branded = text.replace("PS5Upload", "ZeroSpace").replace("[ps5upload]", "[ZeroSpace]")
+            if branded != text:
+                p.write_text(branded, encoding="utf-8")
     (DEST / "UPSTREAM_REVISION").write_text(UPSTREAM_REV + "\n", encoding="utf-8")
     shutil.rmtree(TMP)
     print(f"Imported helper source into {DEST}")
