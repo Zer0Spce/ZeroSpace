@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable build. Pulls the latest successful PS5 Helper artifact and bundles the real ELF.
+# Windows portable build. Pulls the PS5 Helper ELF and embeds it directly into zerospace.exe.
 
 'on':
   workflow_dispatch:
