@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable build. PS5 helper is built separately on Linux with the pinned PS5 Payload SDK.
+# Windows portable rebuild after bundled-helper Tauri path fix; PS5 helper is built separately.
 
 'on':
   workflow_dispatch:
