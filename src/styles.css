@@ -100,3 +100,29 @@ aside nav button.active:before{content:"";position:absolute;left:0;top:8px;botto
 .mediaInfo{display:flex;flex-direction:column;gap:4px;min-width:0}.mediaInfo strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}.mediaInfo small{color:var(--muted)}
 .mediaActions{display:flex;gap:7px}.mediaActions button{white-space:nowrap}
 @media(max-width:850px){.mediaRow{grid-template-columns:22px 64px minmax(0,1fr)}.mediaThumb{width:64px;height:44px}.mediaRow>.captureType{display:none}.mediaActions{grid-column:3}.libraryHeading{align-items:stretch;flex-direction:column}.libraryHeading input{width:100%}}
+
+/* ZeroSpace visual identity pass */
+:root{--zs-radius:12px;--zs-hairline:color-mix(in srgb,var(--border) 78%,transparent)}
+.shell main{background:
+ radial-gradient(circle at 92% 4%,color-mix(in srgb,var(--blue2) 8%,transparent),transparent 24rem),
+ var(--bg)}
+aside{background:linear-gradient(180deg,var(--side),color-mix(in srgb,var(--side) 92%,var(--blue) 8%))}
+.brandGlyph{border-radius:50%;border:0;background:var(--blue);color:white;box-shadow:0 0 0 5px color-mix(in srgb,var(--blue) 10%,transparent)}
+.page>.eyebrow{display:none}
+.page>h1{font-size:34px;font-weight:780;letter-spacing:-.025em}
+.page>.lead{font-size:13px;max-width:680px}
+.card{border-radius:var(--zs-radius);box-shadow:0 10px 30px color-mix(in srgb,var(--shadow) 62%,transparent)}
+button{transition:background .14s ease,border-color .14s ease,transform .08s ease}
+button:active{transform:translateY(1px)}
+.captureFilter{border:1px solid var(--zs-hairline);background:var(--panel2);padding:9px;border-radius:11px}
+.captureFilter input,.captureFilter select,.captureFilter button{margin-top:0}
+.gameGrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.gameCard{border-radius:13px}
+.gameCover{border-bottom:1px solid var(--border)}
+.gameCard strong{font-size:13px;line-height:1.25}
+.gameTitleId{font-size:9px;letter-spacing:.06em;color:var(--blue2)}
+.mediaRow{border-left:3px solid transparent}
+.mediaRow:hover{border-left-color:var(--blue2)}
+.connectionHero{position:relative;overflow:hidden}
+.connectionHero:after{content:"";position:absolute;width:180px;height:180px;border:1px solid color-mix(in srgb,var(--cyan) 13%,transparent);border-radius:50%;right:-95px;top:-95px;pointer-events:none}
+.connectionReady{background:linear-gradient(120deg,var(--panel),color-mix(in srgb,var(--blue) 8%,var(--panel2)))}
