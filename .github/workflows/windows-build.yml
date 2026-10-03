@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable build. Helper-first captures, bulk media downloads, previews, and protocol-aligned FS reads.
+# Windows portable build. ZeroSpace workspace UX milestone with distinct library, connection, and console-status UI.
 
 'on':
   workflow_dispatch:
