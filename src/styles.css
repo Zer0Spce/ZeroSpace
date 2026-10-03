@@ -74,3 +74,29 @@ select{width:100%;margin-top:7px;background:var(--input);border:1px solid var(--
 aside nav{overflow-y:auto;padding-bottom:12px}
 aside nav button{position:relative}
 aside nav button.active:before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--cyan)}
+
+/* Library surfaces */
+.libraryToolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:18px 0 22px;padding:12px 14px;border:1px solid var(--border);background:var(--panel2);border-radius:12px}
+.libraryStatus{display:flex;align-items:center;gap:11px;min-width:0}
+.libraryStatus>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.libraryStatus strong{font-size:13px}.libraryStatus small{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statusDot{width:9px;height:9px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px color-mix(in srgb,var(--muted) 10%,transparent)}
+.statusDot.online{background:#48c78e;box-shadow:0 0 0 4px color-mix(in srgb,#48c78e 12%,transparent)}
+.librarySection{margin-top:8px}
+.libraryHeading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.libraryHeading>div{display:flex;align-items:baseline;gap:10px}.libraryHeading h2{margin:0;font-size:20px}.libraryHeading span{color:var(--muted);font-size:12px}
+.libraryHeading input{width:min(360px,42vw)}
+.gameList.librarySection,.librarySection.gameList{background:none;border:0;padding:0;box-shadow:none}
+.gameGrid{gap:14px}
+.gameCard{overflow:hidden;transition:transform .14s ease,border-color .14s ease;background:var(--panel)}
+.gameCard:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--blue2) 48%,var(--border))}
+.gameCover{aspect-ratio:1/1;width:100%;height:auto;object-fit:cover;background:var(--input)}
+.gameCard>div:last-child{padding:12px}
+.mediaList{display:flex;flex-direction:column;gap:7px}
+.mediaRow{display:grid;grid-template-columns:22px 76px minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--panel);transition:border-color .14s ease,background .14s ease}
+.mediaRow:hover{border-color:color-mix(in srgb,var(--blue2) 40%,var(--border));background:var(--panel2)}
+.mediaRow.selected{border-color:var(--blue2)}
+.mediaThumb{width:76px;height:48px;border-radius:7px;object-fit:cover;background:var(--input);border:1px solid var(--border)}
+.mediaInfo{display:flex;flex-direction:column;gap:4px;min-width:0}.mediaInfo strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}.mediaInfo small{color:var(--muted)}
+.mediaActions{display:flex;gap:7px}.mediaActions button{white-space:nowrap}
+@media(max-width:850px){.mediaRow{grid-template-columns:22px 64px minmax(0,1fr)}.mediaThumb{width:64px;height:44px}.mediaRow>.captureType{display:none}.mediaActions{grid-column:3}.libraryHeading{align-items:stretch;flex-direction:column}.libraryHeading input{width:100%}}
