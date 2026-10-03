@@ -134,3 +134,11 @@ button:active{transform:translateY(1px)}
 
 .settingsActions{flex-wrap:wrap}
 .settingsTest{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--input);font-size:11px;color:var(--muted)}
+
+.connectionStatus.online{border-color:color-mix(in srgb,#48c78e 35%,var(--border));color:#48c78e}
+.consoleFacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+.consoleFacts>div{padding:10px 11px;border:1px solid var(--border);border-radius:9px;background:var(--input);min-width:0}
+.consoleFacts small{display:block;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-size:8px;margin-bottom:4px}
+.consoleFacts strong{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.connectionReady.online{border-color:color-mix(in srgb,#48c78e 28%,var(--border))}
+.connectionReady.online .connectionStep>span{background:#48c78e;color:#08110d}
