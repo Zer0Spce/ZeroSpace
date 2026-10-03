@@ -62,3 +62,15 @@ select{width:100%;margin-top:7px;background:var(--input);border:1px solid var(--
 .capturePreviewCard .captureThumb{object-fit:cover}
 .capturePreviewCard .imagePlaceholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 @media(max-width:900px){.connectionPage{max-width:none}.connectionHero .grid3{grid-template-columns:1fr}}
+
+/* Navigation hierarchy */
+.consoleMini{margin:4px 12px 14px;padding:11px 12px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);background:var(--panel2);border-radius:11px;color:var(--muted)}
+.consoleMini svg{color:var(--cyan)}
+.consoleMini div{min-width:0;display:flex;flex-direction:column;gap:2px}
+.consoleMini strong{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.consoleMini small{font-size:10px}
+.navItem{width:100%}
+.navGroup{padding:13px 16px 6px;font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--muted);opacity:.8}
+aside nav{overflow-y:auto;padding-bottom:12px}
+aside nav button{position:relative}
+aside nav button.active:before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--cyan)}
