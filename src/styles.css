@@ -126,3 +126,8 @@ button:active{transform:translateY(1px)}
 .connectionHero{position:relative;overflow:hidden}
 .connectionHero:after{content:"";position:absolute;width:180px;height:180px;border:1px solid color-mix(in srgb,var(--cyan) 13%,transparent);border-radius:50%;right:-95px;top:-95px;pointer-events:none}
 .connectionReady{background:linear-gradient(120deg,var(--panel),color-mix(in srgb,var(--blue) 8%,var(--panel2)))}
+
+.consoleMini .statusDot{flex:0 0 auto}
+.consoleMini.online{border-color:color-mix(in srgb,#48c78e 30%,var(--border));background:color-mix(in srgb,#48c78e 5%,var(--panel2))}
+.consoleMini.online .statusDot{background:#48c78e;box-shadow:0 0 0 4px color-mix(in srgb,#48c78e 12%,transparent)}
+.consoleMini:not(.online) .statusDot{background:var(--muted);box-shadow:0 0 0 4px color-mix(in srgb,var(--muted) 10%,transparent)}
