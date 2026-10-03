@@ -1,5 +1,5 @@
 name: Windows Build
-# Windows portable build. Persistent tabs, media downloads, previews, and branded helper milestone.
+# Windows portable build. Helper-first captures, bulk media downloads, previews, and protocol-aligned FS reads.
 
 'on':
   workflow_dispatch:
