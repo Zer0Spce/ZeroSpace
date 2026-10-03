@@ -131,3 +131,6 @@ button:active{transform:translateY(1px)}
 .consoleMini.online{border-color:color-mix(in srgb,#48c78e 30%,var(--border));background:color-mix(in srgb,#48c78e 5%,var(--panel2))}
 .consoleMini.online .statusDot{background:#48c78e;box-shadow:0 0 0 4px color-mix(in srgb,#48c78e 12%,transparent)}
 .consoleMini:not(.online) .statusDot{background:var(--muted);box-shadow:0 0 0 4px color-mix(in srgb,var(--muted) 10%,transparent)}
+
+.settingsActions{flex-wrap:wrap}
+.settingsTest{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--input);font-size:11px;color:var(--muted)}
